@@ -18,7 +18,7 @@ let normalize_keywords =
   | "to" => "_to"
   | str => str;
 
-let normalize_name = name => normalize_chars(name) |> normalize_keywords;
+let  normalize_name = name => normalize_chars(name) |> normalize_keywords;
 
 let import_module_name = name => normalize_name(name) |> String.capitalize;
 

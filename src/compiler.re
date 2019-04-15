@@ -44,11 +44,12 @@ module Stage = {
     | _ => [];
   let optimizeAst = program =>
     Optimizer.optimize(make_module_typetable(program), program);
-  let renderAst = programs => {
+  let renderAst = (prefixPath, programs) => {
     let globalTypeTable = Typetable.create(programs);
     List.map(
       program =>
         BsTypeReason.program_to_code(
+          prefixPath,
           program,
           make_module_typetable(program) @ globalTypeTable,
         ),
@@ -111,13 +112,13 @@ module Stage = {
 
 exception ReportableError(string);
 
-let compile = (moduleName, moduleSource, debug) => {
+let compile = (moduleName, moduleSource, debug, prefixPath) => {
   let result =
     try (
       Stage.parseSource(moduleName, moduleSource)
       |> Imports.link
       |> List.map(Stage.optimizeAst)
-      |> Stage.renderAst
+      |> Stage.renderAst(prefixPath)
       |> Stage.combineAst
       |> (((id, code)) => (id, code, [||]))
     ) {

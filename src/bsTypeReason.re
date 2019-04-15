@@ -433,7 +433,7 @@ let rec declaration_to_code = (module_id, type_table) =>
     )
   | FuncDecl(id, component) when Genutils.Is.react_component(component) =>
     render_react_component(module_id, id, type_table, component)
-  | FuncDecl(id, type_of) =>
+  | FuncDecl(id, type_of) => 
     Render.variableDeclaration(
       ~name=Genutils.normalize_name(id),
       ~module_id=Genutils.unquote(module_id),
@@ -507,10 +507,10 @@ let rec declaration_to_code = (module_id, type_table) =>
   | ReactClass(className, propsType) =>
     render_react_class(~className, ~type_table, ~propsType);
 
-let program_to_code = (program, type_table) =>
+let program_to_code = (prefixPath, program, type_table) =>
   switch program {
   | ModuleDecl(id, statements) =>
-    /* is the module nested ? */
+    /* is the module nested ? */ 
     let inner_module_name =
       switch (Genutils.split('/', id, [])) {
       | [_, x, ...xs] =>
@@ -537,7 +537,7 @@ let program_to_code = (program, type_table) =>
       ++ Precode.from_program(program)
       ++ String.concat(
            "\n",
-           List.map(declaration_to_code(id, type_table), statements)
+           List.map(declaration_to_code(Js.String.slice(~from=0, ~to_=1, id) ++ prefixPath ++ Js.String.sliceToEnd(~from=1, id), type_table), statements)
          )
       ++ module_postfix
     ));
